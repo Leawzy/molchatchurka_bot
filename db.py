@@ -22,5 +22,15 @@ class SQLUsers:
             abs = random.choice(result)
             return abs[0]
 
+    def user_list_id(self):
+        with self.connection:
+            result = self.cursor.execute("SELECT `user_id` FROM `users`").fetchall()
+            return result
+
+    def user_list_quantity(self):
+        with self.connection:
+            result = self.cursor.execute("SELECT `quantity` FROM `users`").fetchall()
+            return result
+
     def close(self):
         self.connection.close()
