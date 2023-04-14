@@ -1,6 +1,11 @@
+import re
 import random
 import logging
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.dispatcher import FSMContext
+from aiogram.utils import markdown as md
+from aiogram import filters
+
 from sqlite import SQlitedb
 from db import SQLUsers
 
@@ -54,6 +59,7 @@ async def top(message: types.Message):
     username = []
     userquantity = []
     lol = message.chat.id
+
     for a in top:
         for b in a:
             username.append(b)
@@ -62,11 +68,51 @@ async def top(message: types.Message):
         for d in c:
             userquantity.append(d)
 
+    # Сортируем списки username и userquantity по убыванию количества сообщений
+    sorted_data = sorted(zip(userquantity, username), reverse=True)
+    userquantity, username = zip(*sorted_data)
+
+    text = "Топ пользователей:\n"
     for a in range(len(username)):
         name = await bot.get_chat_member(lol, username[a])
         usname = name['user']['first_name']
-        await message.answer(f'Данный молодой человек: {usname}'
-                             f'\nЛюбит в жопу раз: {userquantity[a]}')
+        text += f"{a + 1}. {usname} - {userquantity[a]} раз(а)\n"
+
+    await message.answer(text)
+
+
+# # Функция для начисления монеток за сообщения
+# async def give_coin(message: types.Message, state: FSMContext):
+#     user_id = message.from_user.id
+#
+#     # Проверяем, есть ли пользователь в таблице с монетками
+#     user = dbu.execute("SELECT * FROM coins WHERE user_id = ?", (user_id,)).fetchone()
+#     if not user:
+#         # Если пользователя нет, то добавляем его в таблицу
+#         dbu.execute("INSERT INTO coins (user_id) VALUES (?)", (user_id,))
+#         dbu.commit()
+#
+#     # Увеличиваем количество монеток пользователя на 1
+#     dbu.execute("UPDATE coins SET coins = coins + 1 WHERE user_id = ?", (user_id,))
+#     dbu.commit()
+#
+#     # Отправляем сообщение пользователю о получении монетки
+#     # await message.reply("Вы получили монетку за сообщение!", parse_mode=ParseMode.HTML)
+
+
+@dp.message_handler(content_types=types.ContentType.TEXT)
+async def on_text(message: types.Message):
+    # Проверка текста сообщения
+    if re.search(r'@all', message.text, re.IGNORECASE):
+        # Отправка ответного сообщения
+        users = [398768670, 520017594, 456575867, 636028497]
+        chat_id = message.chat.id
+        text = "Пингую пидоров:\n"
+        for user_id in users:
+            user = await bot.get_chat_member(chat_id, user_id)
+            username = user['user']['first_name']
+            text += f'<a href="tg://user?id={user_id}">{username}</a>\n'
+        await bot.send_message(chat_id=message.chat.id, text=text, parse_mode='html')
 
 
 @dp.message_handler(commands=['add'])
