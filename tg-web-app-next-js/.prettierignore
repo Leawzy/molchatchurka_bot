@@ -1,0 +1,8 @@
+node_modules
+vendor
+public
+storage
+build
+dist
+.next
+.env
