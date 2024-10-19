@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+    networks:
+      - bot-network
+    volumes:
+      - ./back:/var/www
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+  frontend:
+    build:
+      context: ./front
+      dockerfile: _docker/frontend/Dockerfile
+    container_name: frontend
+    networks:
+      - bot-network
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+
+networks:
+  bot-network:
