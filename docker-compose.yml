@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+      - "443:443"
+    depends_on:
+      - web-app
+    networks:
+      - bot-network
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt/live/dev.makirou.webtm.ru:/etc/letsencrypt/live/dev.makirou.webtm.ru
+      - /etc/letsencrypt/archive/dev.makirou.webtm.ru:/etc/letsencrypt/archive/dev.makirou.webtm.ru
+
+  web-app:
+    build:
+      context: ./tg-web-app-next-js
+      dockerfile: tg-web-app-next-js/_docker/web/Dockerfile
+    container_name: web-web
+    networks:
+      - bot-network
+    ports:
+      - "3000:3000"
+
+networks:
+  bot-network:
