@@ -31,6 +31,7 @@ const randomUser = async () => {
   }
 
   const randomIndex = Math.floor(Math.random() * users.length);
+  await updateUser(users[randomIndex].user_id);
   return users[randomIndex].user_id;
 };
 
