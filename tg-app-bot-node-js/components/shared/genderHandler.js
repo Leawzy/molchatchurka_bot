@@ -2,16 +2,11 @@ import { randomUser, updateUser } from "../../hooks/users/useGetUserHook.js";
 
 export async function handleGender(bot, message) {
   const chatId = message.chat.id;
-  let userId;
-  let attempts = 0; // Счетчик попыток
+  const userId = await randomUser();
 
-  do {
-    userId = await randomUser();
-    attempts++;
-    if (attempts > 2) { // Ограничиваем количество попыток
-      throw new Error("Не удалось найти нового пользователя после 10 попыток");
-    }
-  } while (userId === null); // Проверяем, что userId не равен null
+  if (userId === null) { // Проверяем, что userId не равен null
+    throw new Error("Не удалось найти пользователя");
+  }
 
   const name = await bot.getChatMember(chatId, userId);
 
